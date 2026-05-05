@@ -395,6 +395,9 @@ def Pending():
 
 @app.route("/borrow")
 def borrow():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cur.execute("SELECT * FROM equipments")
     equipment = cur.fetchall()
@@ -831,16 +834,10 @@ def remove_item():
 
 @app.route("/Request")
 def Request():
-
+    if "user_id" not in session:
+        return redirect(url_for("home"))
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-    cur.execute("""
-        SELECT COUNT(*) as total
-        FROM borrow
-        WHERE status = 1
-    """)
-    borrow_request_count = cur.fetchone()["total"]
 
     cur.execute("""
         SELECT *
@@ -849,6 +846,13 @@ def Request():
         ORDER BY id DESC
     """)
     requests = cur.fetchall()
+
+    cur.execute("""
+        SELECT COUNT(*) AS total
+        FROM borrow
+        WHERE status = 1
+    """)
+    borrow_request_count = cur.fetchone()["total"]
 
     cur.close()
 
