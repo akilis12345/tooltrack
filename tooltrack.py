@@ -12,10 +12,18 @@ app.secret_key = "mysecretkey123"
 # =========================
 # DATABASE CONFIG
 # =========================
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')         # cloud DB host
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')         # cloud DB username
-app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD') # cloud DB password
-app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')             # cloud DB name
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
+
+if not all([
+    app.config['MYSQL_HOST'],
+    app.config['MYSQL_USER'],
+    app.config['MYSQL_PASSWORD'],
+    app.config['MYSQL_DB']
+]):
+    raise Exception("Missing MYSQL environment variables")
 
 # =========================
 # MAIL CONFIG (FIXED)
