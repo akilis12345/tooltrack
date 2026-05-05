@@ -12,10 +12,11 @@ app.secret_key = "mysecretkey123"
 # =========================
 # DATABASE CONFIG
 # =========================
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'Software'
+app.config['MYSQL_HOST'] = 'sql12.freesqldatabase.com'
+app.config['MYSQL_USER'] = 'sql12825480'
+app.config['MYSQL_PASSWORD'] = '2bNfRNXr5D'
+app.config['MYSQL_DB'] = 'sql12825480'
+app.config['MYSQL_PORT'] = 3306  
 
 # =========================
 # MAIL CONFIG (FIXED)
