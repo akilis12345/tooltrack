@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sign Up</title>
+
+<style>
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    min-height: 100%;
+    font-family: 'Arial', sans-serif;
+}
+
+/* BACKGROUND */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 0;
+
+    background-image: url("{{ url_for('static', filename='images/background2.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* DARK OVERLAY (same as login) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* subtle uniform overlay instead of random dark areas */
+    background: rgba(0, 0, 0, 0.25);
+
+    z-index: 0;
+}
+
+/* CONTAINER (same style as login box) */
+.login-container {
+    position: relative;
+    z-index: 1;
+
+    width: 420px;
+    max-width: 92%;
+    padding: 40px;
+
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+    text-align: center;
+
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.9s ease forwards;
+}
+
+/* ANIMATION */
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* LOGO */
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid rgba(255,255,255,0.4);
+}
+
+/* TITLES */
+h2 {
+    color: white;
+    font-size: 18px;
+}
+
+h3 {
+    color: #ddd;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* LABEL */
+label {
+    display: block;
+    text-align: left;
+    color: #eee;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 15px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.2);
+    color: white;
+
+    outline: none;
+    transition: 0.3s;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+input:focus {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.02);
+}
+
+/* ROWS */
+.name-row {
+    display: flex;
+    gap: 10px;
+}
+
+.login-row {
+    flex: 1;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    color: white;
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(37,117,252,0.5);
+}
+
+/* FOOTER */
+.login-footer {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #ddd;
+}
+
+.login-footer a {
+    color: #6aa8ff;
+    text-decoration: none;
+}
+
+/* FLASH */
+.flash {
+    color: #7CFC98;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+/* EYE */
+.password-wrapper {
+    position: relative;
+}
+
+.eye {
+    position: absolute;
+    right: 12px;
+    top: 38%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    user-select: none;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <img src="{{ url_for('static', filename='images/yown.jpg') }}" class="logo">
+
+    <h2>Barangay Dela Paz Norte System</h2>
+    <h3>Sign Up</h3>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="/signup" method="post">
+
+        <div class="name-row">
+            <div class="login-row">
+                <label>Surname</label>
+                <input type="text" name="surname" class="lettersonly" required>
+            </div>
+
+            <div class="login-row">
+                <label>First Name</label>
+                <input type="text" name="firstname" class="lettersonly" required>
+            </div>
+        </div>
+
+        <label>Middle Initial</label>
+        <input type="text" name="middleinitial" maxlength="1" class="lettersonly" required>
+
+        <label>Username</label>
+        <input type="text" name="username" maxlength="12" minlength="6" required>
+
+        <label>Gmail</label>
+        <input type="text" name="Gmail" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" maxlength="11" class="numbersonly" required>
+
+        <label>Password</label>
+
+        <div class="password-wrapper">
+            <input type="password" name="password" id="signupPassword" minlength="6" maxlength="12" required>
+
+            <span class="eye" onclick="toggleSignupPassword()">👁</span>
+        </div>
+
+        <label>Purok</label>
+        <input type="text" name="Purok" class="numbersonly" maxlength="1" required>
+
+        <button type="submit">Sign Up</button>
+
+    </form>
+
+    <div class="login-footer">
+        <p>Already have an account? <a href="/Logout">Log In</a></p>
+    </div>
+
+</div>
+
+<!-- scripts -->
+<script>
+document.querySelectorAll('.lettersonly').forEach(input => {
+    input.addEventListener('input', function () {
+        this.value = this.value.replace(/[^A-Za-z]/g, '');
+    });
+});
+
+document.querySelectorAll('.numbersonly').forEach(input => {
+    input.addEventListener('input', function () {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+});
+
+function toggleSignupPassword() {
+    const input = document.getElementById("signupPassword");
+
+    if (input.type === "password") {
+        input.type = "text";
+    } else {
+        input.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>
