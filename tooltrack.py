@@ -403,6 +403,10 @@ def borrow():
     equipment = cur.fetchall()
     cur.close()
 
+    # Ensure equipment is always a list, even if empty
+    if equipment is None:
+        equipment = []
+
     return render_template("Borrow.html", equipment=equipment)
 
 # =========================
@@ -838,7 +842,6 @@ def Request():
         return redirect(url_for("home"))
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
     cur.execute("""
         SELECT *
         FROM borrow
@@ -846,22 +849,19 @@ def Request():
         ORDER BY id DESC
     """)
     requests = cur.fetchall()
-
-    cur.execute("""
-        SELECT COUNT(*) AS total
-        FROM borrow
-        WHERE status = 1
-    """)
-    borrow_request_count = cur.fetchone()["total"]
-
     cur.close()
+
+    # Ensure requests is always a list
+    if requests is None:
+        requests = []
+
+    borrow_request_count = len(requests)  # safer than querying count separately
 
     return render_template(
         "Request.html",
         requests=requests,
         borrow_request_count=borrow_request_count
     )
-
 @app.route("/update-request", methods=["POST"])
 def update_request():
 
