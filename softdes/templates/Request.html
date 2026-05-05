@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Requests</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-image: url("{{ url_for('static', filename='images/background1.jpg') }}");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* MAIN CONTAINER */
+.container {
+    max-width: 1050px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+
+    animation: fadeInUp 0.6s ease;
+}
+
+/* TITLE */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    letter-spacing: 0.5px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* HEADER */
+th {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+}
+
+/* CELLS */
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    transition: 0.25s;
+}
+
+/* ROW HOVER */
+tr:hover {
+    background: rgba(44,62,80,0.08);
+    transform: scale(1.01);
+}
+
+/* BUTTONS */
+.btn {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    transition: 0.25s;
+    margin: 3px;
+}
+
+.btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.accept {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+
+.reject {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+
+/* DESCRIPTION INPUT */
+.desc-input {
+    width: 95%;
+    padding: 7px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    transition: 0.3s;
+}
+
+.desc-input:focus {
+    outline: none;
+    border-color: #2c3e50;
+    box-shadow: 0 0 8px rgba(44,62,80,0.25);
+}
+
+/* SAVED TEXT */
+.saved-desc {
+    font-size: 11px;
+    color: #444;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* NOTIF */
+.notif {
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 50%;
+    margin-left: 8px;
+}
+
+/* ANIMATION */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+</head>
+
+<header>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='images/yown.jpg') }}" alt="logo">
+        <h1>Barangay De La Paz Norte Equipment Inventory</h1>
+    </div>
+</header>
+
+<body>
+
+<div class="sidebar">
+
+    <h3 class="menu-title">Menu</h3>
+
+    <a href="/inventoryA" class="nav-item">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        Inventory
+    </a>
+
+    <a href="/manage" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        Manage
+    </a>
+
+    <a href="/users" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        Users
+    </a>
+
+    <a href="/Request" class="nav-item notif-wrapper">
+        <i class="fa-solid fa-inbox"></i>
+        Requests
+
+        {% if borrow_request_count > 0 %}
+            <span class="notif-badge">{{ borrow_request_count }}</span>
+        {% endif %}
+    </a>
+
+    <a href="/History" class="nav-item">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Borrow/reservation History
+    </a>
+
+    <div class="spacer"></div>
+
+    <a href="/Logout" class="nav-item logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </a>
+
+</div>
+
+<div class="container">
+
+<h2>Admin - Equipment Requests</h2>
+
+<table>
+<thead>
+<tr>
+    <th>Request ID</th>
+    <th>User Name</th>
+    <th>Purok</th>
+    <th>Equipment Name</th>
+    <th>Quantity</th>
+    <th>Date borrowed</th>
+    <th>Date returned</th>
+    <th>Description</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in requests %}
+<tr>
+    <td>{{ item.id }}</td>
+    <td>{{ item.fullname }}</td>
+    <td>{{ item.purok }}</td>
+    <td>{{ item.equipment_name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.datefrom }}</td>
+    <td>{{ item.dateto }}</td>
+
+    <td>
+        <form method="POST" action="/update-request">
+            <input type="hidden" name="id" value="{{ item.id }}">
+
+            <input type="text" name="description"
+                   class="desc-input"
+                   maxlength="100"
+                   placeholder="Enter description..." required>
+
+            {% if item.description %}
+                <div class="saved-desc">
+                    Saved: {{ item.description }}
+                </div>
+            {% endif %}
+    </td>
+
+    <td>
+        <button class="btn accept" name="action" value="return_good">
+            RETURNED
+        </button>
+
+        <button class="btn reject" name="action" value="return_broken">
+            BROKEN RETURN
+        </button>
+        </form>
+    </td>
+</tr>
+
+{% else %}
+
+<tr>
+    <td colspan="9" style="
+        text-align:center;
+        padding:20px;
+        font-weight:bold;
+        color:#666;
+        font-size:16px;
+    ">
+        No requests found
+    </td>
+</tr>
+
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+
+</body>
+</html>

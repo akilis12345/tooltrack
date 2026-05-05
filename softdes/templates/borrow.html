@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Borrow Equipment</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background-image: url("{{ url_for('static', filename='images/background1.jpg') }}");
+    background-size: cover;
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(10px);
+
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+
+    animation: fadeUp 0.7s ease;
+}
+
+/* TITLES */
+h2, h3 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+/* FORM */
+form {
+    background: rgba(255,255,255,0.4);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+/* INPUTS */
+select,
+input[type="number"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+
+    outline: none;
+    transition: 0.3s;
+    background: rgba(255,255,255,0.7);
+    box-sizing: border-box;
+}
+
+select:focus,
+input:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 10px rgba(44,62,80,0.25);
+    transform: scale(1.02);
+}
+
+/* DATE ROW */
+.date-row {
+    display: flex;
+    gap: 15px;
+}
+
+.date-row div {
+    flex: 1;
+}
+
+/* BUTTONS */
+button {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+
+/* SUCCESS BUTTON */
+.success {
+    background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+    transform: scale(1.1);
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+
+    background: rgba(255,255,255,0.6);
+    border-radius: 10px;
+    overflow: hidden;
+
+    animation: fadeIn 0.6s ease;
+}
+
+th {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 12px;
+}
+
+td {
+    text-align: center;
+    padding: 10px;
+}
+
+/* FLASH */
+.flash-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.flash-box {
+    background: rgba(231,76,60,0.95);
+    color: white;
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+
+    animation: popIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+}
+
+/* CART ICON */
+.cart-icon {
+    position: absolute;
+    right: 30px;
+    top: 20px;
+    font-size: 22px;
+    cursor: pointer;
+    color: white;
+    background: rgba(44,62,80,0.85);
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.cart-icon span {
+    font-weight: bold;
+}
+
+/* CART BUMP */
+@keyframes bump {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.2); }
+    60% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.bump {
+    animation: bump 0.4s ease;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+    from { transform: translateY(-10px) scale(0.95); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='images/yown.jpg') }}">
+        <h1>Borrow System</h1>
+    </div>
+</header>
+
+<div class="sidebar">
+    <div class="profile-card">
+    <div class="profile-avatar">
+        <i class="fa-solid fa-user"></i>
+    </div>
+
+    <div class="profile-info">
+        <h4>{{ session['username'] }}</h4>
+        <p>{{ session['fullname'] }}</p>
+        <small>{{ session.get('email', '') }}</small>
+    </div>
+</div>
+    <h3>Menu</h3>
+
+    <a href="/Costumerinv"><i class="fa-solid fa-box"></i> Inventory</a>
+    <a href="/borrow"><i class="fa-solid fa-cart-shopping"></i> Borrow</a>
+    <a href="/Pending"><i class="fa-solid fa-envelope"></i> Request</a>
+    <a href="/about"><i class="fa-solid fa-circle-info"></i> About</a>
+
+    <a href="/Logout" class="logout">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
+</div>
+
+<div class="container">
+
+<h2>Borrow Equipment</h2>
+
+<form method="POST" action="/add-to-borrow" id="borrowForm">
+
+<div class="form-group">
+    <label>Equipment</label>
+    <select name="id" required>
+        <option disabled selected>Select Equipment</option>
+        {% for item in equipment %}
+        <option value="{{ item.id }}">{{ item.equipmentname }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Quantity</label>
+    <input type="number" name="quantity" min="1" required>
+</div>
+
+<div class="date-row">
+    <div class="form-group">
+        <label>Date From</label>
+        <input type="date" name="datefrom" required>
+    </div>
+
+    <div class="form-group">
+        <label>Date To</label>
+        <input type="date" name="dateto" required>
+    </div>
+</div>
+
+<button type="submit" id="addBtn">Add to List</button>
+
+</form>
+
+<h3>Your Borrow List</h3>
+
+<table>
+<thead>
+<tr>
+    <th>Equipment</th>
+    <th>Quantity</th>
+    <th>Date From</th>
+    <th>Date To</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in session.get('borrow_list', []) %}
+<tr>
+    <td>{{ item.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.datefrom }}</td>
+    <td>{{ item.dateto }}</td>
+    <td>
+        <form method="POST" action="/remove-item">
+            <input type="hidden" name="index" value="{{ loop.index0 }}">
+            <button class="remove-btn" type="submit">Remove</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<br>
+
+<form method="POST" action="/submit-borrow">
+    <button type="submit">Submit All Requests</button>
+</form>
+
+</div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for msg in messages %}
+        <div class="flash-box">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ANIMATION SCRIPT -->
+<script>
+let cartCount = 0;
+
+document.getElementById("borrowForm").addEventListener("submit", function () {
+    const btn = document.getElementById("addBtn");
+
+    // Button animation
+    btn.classList.add("success");
+    btn.innerText = "Added ✓";
+
+    setTimeout(() => {
+        btn.classList.remove("success");
+        btn.innerText = "Add to List";
+    }, 1000);
+
+    // Cart animation
+    cartCount++;
+    document.getElementById("cartCount").innerText = cartCount;
+
+    const cartIcon = document.getElementById("cartIcon");
+    cartIcon.classList.add("bump");
+
+    setTimeout(() => {
+        cartIcon.classList.remove("bump");
+    }, 400);
+});
+</script>
+
+</body>
+</html>

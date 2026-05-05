@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login Page</title>
+
+<style>
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Arial', sans-serif;
+}
+
+/* BACKGROUND */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("{{ url_for('static', filename='images/background2.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* DARK OVERLAY */
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    z-index: 0;
+}
+
+/* LOGIN BOX */
+.login-container {
+    position: relative;
+    z-index: 1;
+
+    width: 380px;
+    max-width: 90%;
+    padding: 40px;
+
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+    text-align: center;
+
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.9s ease forwards;
+}
+
+/* ANIMATION */
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* LOGO */
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid rgba(255,255,255,0.4);
+}
+
+/* TITLE */
+.login-container h2 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.login-container h3 {
+    color: #ddd;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+/* LABEL */
+label {
+    display: block;
+    text-align: left;
+    color: #eee;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.2);
+    color: white;
+
+    outline: none;
+    transition: 0.3s;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+input:focus {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.02);
+}
+
+/* PASSWORD WRAPPER */
+.password-wrapper {
+    position: relative;
+}
+
+/* EYE ICON */
+.eye {
+    position: absolute;
+    right: 12px;
+    top: 38%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    user-select: none;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(37,117,252,0.5);
+}
+
+/* FOOTER */
+.login-footer {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #ddd;
+}
+
+.login-footer a {
+    color: #6aa8ff;
+    text-decoration: none;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
+
+/* FLASH */
+.flash {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <img src="{{ url_for('static', filename='images/yown.jpg') }}" class="logo">
+
+    <h2>Barangay Dela Paz Norte System</h2>
+    <h3>Login to Continue</h3>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="/login" method="post">
+
+        <label>Username</label>
+        <input type="text" name="username" maxlength="12" placeholder="Enter username" required>
+
+        <label>Password</label>
+
+        <div class="password-wrapper">
+            <input type="password" name="password" id="loginPassword" maxlength="12" placeholder="Enter password" required>
+
+            <span class="eye" onclick="togglePassword()">👁</span>
+        </div>
+
+        <button type="submit">LOGIN</button>
+
+    </form>
+
+    <div class="login-footer">
+        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    </div>
+
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById("loginPassword");
+
+    if (input.type === "password") {
+        input.type = "text";
+    } else {
+        input.type = "password";
+    }
+}
+</script>
+
+</body>
+</html>
