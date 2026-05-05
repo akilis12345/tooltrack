@@ -12,11 +12,10 @@ app.secret_key = "mysecretkey123"
 # =========================
 # DATABASE CONFIG
 # =========================
-app.config['MYSQL_HOST'] = 'sql12.freesqldatabase.com'
-app.config['MYSQL_USER'] = 'sql12825480'
-app.config['MYSQL_PASSWORD'] = '2bNfRNXr5D'
-app.config['MYSQL_DB'] = 'sql12825480'
-app.config['MYSQL_PORT'] = 3306  
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')         # cloud DB host
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')         # cloud DB username
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD') # cloud DB password
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')             # cloud DB name
 
 # =========================
 # MAIL CONFIG (FIXED)
