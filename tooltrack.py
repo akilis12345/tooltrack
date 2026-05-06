@@ -221,61 +221,42 @@ def verify_page():
 
     return render_template("verify.html", email=email)
 
-@app.route("/verify-code", methods=["POST"])
-def verify_code():
-    email = request.form.get("email")
-    code = request.form.get("code")
+@app.route("/resend-code", methods=["POST"])
+def resend_code():
+    try:
+        email = session.get("pending_email")
 
-    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        if not email:
+            flash("Session expired. Please sign up again.")
+            return redirect(url_for("home"))
 
-    cur.execute("""
-        SELECT * FROM users
-        WHERE email=%s AND verification_code=%s
-    """, (email, code))
+        code = str(random.randint(100000, 999999))
 
-    user = cur.fetchone()
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    if user:
         cur.execute("""
             UPDATE users
-            SET is_verified=1, verification_code=NULL
-            WHERE email=%s
-        """, (email,))
+            SET verification_code = %s
+            WHERE email = %s AND is_verified = 0
+        """, (code, email))
+
         mysql.connection.commit()
         cur.close()
 
-        session.pop("pending_email", None)
+        send_verification_email(email, code)
 
-        flash("Verified successfully!")
-        return redirect(url_for("home"))
+        flash("Code resent.")
+        return redirect(url_for("verify_page"))
 
-    flash("Invalid code.")
-    return redirect(url_for("verify_page"))
+    except Exception as e:
+        print("🔥 RESEND ERROR:", str(e))
+        flash("Server error during resend.")
+        return redirect(url_for("verify_page"))
 
-@app.route("/resend-code", methods=["POST"])
-def resend_code():
-    email = session.get("pending_email")
-
-    if not email:
-        flash("Session expired.")
-        return redirect(url_for("home"))
-
-    code = str(random.randint(100000, 999999))
-
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        UPDATE users
-        SET verification_code=%s
-        WHERE email=%s AND is_verified=0
-    """, (code, email))
-
-    mysql.connection.commit()
-    cur.close()
-
-    send_verification_email(email, code)
-
-    flash("Code resent.")
-    return redirect(url_for("verify_page"))
+    except Exception as e:
+        print("🔥 RESEND ERROR:", str(e))
+        flash("Server error during resend. Check logs.")
+        return redirect(url_for("verify_page"))
 
 
 def send_verification_email(email, code):
