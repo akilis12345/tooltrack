@@ -62,8 +62,8 @@
     <button type="submit" class="btn btn-primary">Verify Now</button>
 </form>
 
-<form method="POST" action="{{ url_for('resend_code') }}" class="mt-2">
-    <button type="submit" class="btn btn-link p-0">Didn't receive the email? Resend</button>
+<form action="/resend-code" method="POST">
+    <button type="submit">Resend Code</button>
 </form>
 
     <!-- Bootstrap JS (Optional) -->
