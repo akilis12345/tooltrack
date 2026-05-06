@@ -8,6 +8,8 @@ import random
 import os
 app = Flask(__name__)
 app.secret_key = "mysecretkey123"
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # =========================
 # DATABASE CONFIG
@@ -39,7 +41,7 @@ app.config['MAIL_PASSWORD'] = 'flfpieeasfqtufhr'
 scheduler = BackgroundScheduler()
 mysql = MySQL(app)
 mail = Mail(app)    
-app.secret_key = "mysecretkey123"
+
 
 def is_available(mysql, equipment_name, required_qty, total_qty, start_date, end_date):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -117,6 +119,7 @@ def login():
         if user["is_verified"] == 0:
             # ✅ FIX: store email for verification page
             session["pending_email"] = user["email"]
+            session.modified = True
 
             flash("Please verify your email first.")
             return redirect(url_for("verify_page"))
@@ -175,6 +178,7 @@ def signup():
 
             # ✅ FIX
             session["pending_email"] = Gmail
+            session.modified = True
 
             send_verification_email(Gmail, code)
             flash("Verification code resent.")
