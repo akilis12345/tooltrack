@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import MySQLdb.cursors 
 import random
 import os
+import smtplib
 app = Flask(__name__)
 app.secret_key = "mysecretkey123"
 app.config['SESSION_COOKIE_SECURE'] = False
@@ -36,7 +37,9 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.environ.get("MAIL_PASSWORD")
+
 app.config['MAIL_DEBUG'] = True
+app.config['MAIL_TIMEOUT'] = 10
 
 # INIT EXTENSIONS (ORDER MATTERS)
 scheduler = BackgroundScheduler()
@@ -299,13 +302,18 @@ def resend_code():
     return redirect(url_for("verify_page"))
 
 def send_verification_email(email, code):
-    msg = Message(
-        subject="Email Verification Code",
-        sender=app.config['MAIL_USERNAME'],
-        recipients=[email]
-    )
-    msg.body = f"Your verification code is: {code}"
-    mail.send(msg)
+    try:
+        msg = Message(
+            subject="Email Verification Code",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+        msg.body = f"Your verification code is: {code}"
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+        return False
 
 
 def send_return_email(email, fullname, equipment_name, due_date):
