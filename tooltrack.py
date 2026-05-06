@@ -296,7 +296,19 @@ def resend_code():
 
 
 def send_verification_email(email, code):
-    print("FAKE EMAIL SENT:", email, code)
+    try:
+        msg = Message(
+            subject="Email Verification Code",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+
+        msg.body = f"Your verification code is: {code}"
+
+        mail.send(msg)
+
+    except Exception as e:
+        print("EMAIL ERROR:", e)
 
 def send_return_email(email, fullname, equipment_name, due_date):
     try:
