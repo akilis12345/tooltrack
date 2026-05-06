@@ -218,19 +218,50 @@ def verify_page():
     if not email:
         flash("Session expired or invalid. Please log in again.")
         return redirect(url_for("home"))
-        
-    return render_template("verify.html", email=email or "")
 
     return render_template("verify.html", email=email)
 
+@app.route("/verify_code", methods=["POST"])
+def verify_code():
+    email = request.form.get("email")
+    code = request.form.get("code")
+
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cur.execute("""
+        SELECT * FROM users
+        WHERE email=%s AND verification_code=%s
+    """, (email, code))
+
+    user = cur.fetchone()
+
+    if not user:
+        flash("Invalid verification code")
+        return redirect(url_for("verify_page"))
+
+    cur.execute("""
+        UPDATE users
+        SET is_verified=1
+        WHERE email=%s
+    """, (email,))
+
+    mysql.connection.commit()
+    cur.close()
+
+    flash("Email verified! You can now log in.")
+    session.pop("pending_email", None)
+
+    return redirect(url_for("home"))
+
 @app.route("/resend-code", methods=["POST"])
 def resend_code():
-    email = session.get("pending_email")
-    if not email:
-        flash("Session expired. Please log in or sign up again.")
-        return redirect(url_for("home"))
-
     try:
+        email = session.get("pending_email")
+
+        if not email:
+            flash("Session expired. Please log in or sign up again.")
+            return redirect(url_for("home"))
+
         code = str(random.randint(100000, 999999))
 
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -243,12 +274,15 @@ def resend_code():
         cur.close()
 
         send_verification_email(email, code)
+
         flash("Verification code resent.")
+
     except Exception as e:
         print("🔥 RESEND ERROR:", repr(e))
-        flash("Server error. Check logs.")
+        flash("Server error during resend.")
 
     return redirect(url_for("verify_page"))
+
 
 
 def send_verification_email(email, code):
