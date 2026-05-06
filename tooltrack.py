@@ -35,7 +35,8 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'tooltrack2026@gmail.com'
-app.config['MAIL_PASSWORD'] = 'flfpieeasfqtufhr'
+app.config['MAIL_PASSWORD'] = 'dyqjzjabordnvkfo'
+app.config['MAIL_DEBUG'] = True
 
 # INIT EXTENSIONS (ORDER MATTERS)
 scheduler = BackgroundScheduler()
@@ -297,6 +298,19 @@ def resend_code():
 
     return redirect(url_for("verify_page"))
 
+@app.route("/test-email")
+def test_email():
+    try:
+        msg = Message(
+            "Test",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=["your_email@gmail.com"]
+        )
+        msg.body = "Testing email system"
+        mail.send(msg)
+        return "EMAIL SENT"
+    except Exception as e:
+        return str(e)
 
 def send_verification_email(email, code):
     try:
@@ -310,8 +324,11 @@ def send_verification_email(email, code):
 
         mail.send(msg)
 
+        print("EMAIL SENT SUCCESSFULLY")
+
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print("EMAIL ERROR (REAL):", e)
+
 
 def send_return_email(email, fullname, equipment_name, due_date):
     try:
