@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_mysqldb import MySQL 
 from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
@@ -39,6 +39,7 @@ app.config['MAIL_PASSWORD'] = 'flfpieeasfqtufhr'
 scheduler = BackgroundScheduler()
 mysql = MySQL(app)
 mail = Mail(app)    
+app.secret_key = "mysecretkey123"
 
 def is_available(mysql, equipment_name, required_qty, total_qty, start_date, end_date):
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -407,7 +408,7 @@ def borrow():
     if equipment is None:
         equipment = []
 
-    return render_template("Borrow.html", equipment=equipment)
+    return render_template("borrow.html", equipment=equipment)
 
 # =========================
 # History (History)
