@@ -7,6 +7,7 @@ import MySQLdb.cursors
 import random
 import os
 import smtplib
+import threading
 app = Flask(__name__)
 app.secret_key = "mysecretkey123"
 app.config['SESSION_COOKIE_SECURE'] = False
@@ -184,7 +185,10 @@ def signup():
             session["pending_email"] = Gmail
             session.modified = True
 
-            send_verification_email(Gmail, code)
+            threading.Thread(
+                target=send_verification_email,
+                args=(Gmail, code)
+            ).start()
             flash("Verification code resent.")
             return redirect(url_for("verify_page"))
         else:
@@ -206,7 +210,10 @@ def signup():
     # ✅ FIX
     session["pending_email"] = Gmail
 
-    send_verification_email(Gmail, code)
+    threading.Thread(
+        target=send_verification_email,
+        args=(Gmail, code)
+    ).start()
     flash("Verification code sent.")
 
     return redirect(url_for("verify_page"))
@@ -291,7 +298,10 @@ def resend_code():
         cur.close()
 
         # Send email again
-        send_verification_email(email, code)
+        threading.Thread(
+            target=send_verification_email,
+            args=(email, code)
+        ).start()
 
         flash("Verification code resent successfully.")
 
