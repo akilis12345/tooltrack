@@ -8,7 +8,7 @@ import random
 import os
 app = Flask(__name__)
 app.secret_key = "mysecretkey123"
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # =========================
@@ -216,7 +216,7 @@ def verify_page():
     email = session.get("pending_email")
 
     if not email:
-        flash("Session expired or invalid. Please log in again.")
+        flash("Session expired. Please login or register again.")
         return redirect(url_for("home"))
 
     return render_template("verify.html", email=email)
@@ -259,19 +259,24 @@ def verify_code():
 
 @app.route("/resend-code", methods=["POST"])
 def resend_code():
-    print("SESSION:", dict(session))  # safe way to print session
-    print("EMAIL:", session.get("pending_email"))
 
+    # Get email from session
     email = session.get("pending_email")
 
+    print("EMAIL IN SESSION:", email)
+
+    # If session expired or missing
     if not email:
-        flash("Session expired. Please log in again.")
+        flash("Session expired. Please register or log in again.")
         return redirect(url_for("home"))
 
     try:
+        # Generate new verification code
         code = str(random.randint(100000, 999999))
 
-        cur = mysql.connection.cursor()
+        # Update code in database
+        cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
         cur.execute("""
             UPDATE users
             SET verification_code = %s
@@ -281,13 +286,14 @@ def resend_code():
         mysql.connection.commit()
         cur.close()
 
+        # Send email again
         send_verification_email(email, code)
 
-        flash("Verification code resent.")
+        flash("Verification code resent successfully.")
 
     except Exception as e:
-        print("RESEND CRASH:", e)
-        flash("Server error during resend.")
+        print("RESEND ERROR:", e)
+        flash("Failed to resend code. Please try again.")
 
     return redirect(url_for("verify_page"))
 
