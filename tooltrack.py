@@ -519,6 +519,7 @@ def users():
 def inventoryA():
     search = request.args.get('search')
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
     if search:
         cur.execute("""
             SELECT * FROM equipments
@@ -526,23 +527,32 @@ def inventoryA():
         """, ('%' + search + '%',))
     else:
         cur.execute("SELECT * FROM equipments")
-    
+
     equipment_list = cur.fetchall()
 
-    # Count pending borrow/return requests (status 0 or 4)
+    # ✅ Calculate available for each item
+    for item in equipment_list:
+        cur.execute("""
+            SELECT SUM(quantity) as borrowed
+            FROM borrow
+            WHERE equipment_name = %s
+            AND status = 1
+        """, (item["equipmentname"],))
+        result = cur.fetchone()
+        borrowed = result["borrowed"] if result["borrowed"] else 0
+        item["available"] = item["quantity"] - borrowed
+
+    # Count pending requests
     cur.execute("SELECT COUNT(*) AS total FROM borrow WHERE status = 1")
     borrow_request_count = cur.fetchone()["total"]
-
 
     cur.close()
 
     return render_template(
         "Admininv.html",
         equipment=equipment_list,
-        borrow_request_count=borrow_request_count,
-       
+        borrow_request_count=borrow_request_count
     )
-
 # =========================
 # MANAGE SHI
 # =========================
