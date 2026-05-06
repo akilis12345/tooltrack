@@ -298,36 +298,14 @@ def resend_code():
 
     return redirect(url_for("verify_page"))
 
-@app.route("/test-email")
-def test_email():
-    try:
-        msg = Message(
-            "Test",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=["your_email@gmail.com"]
-        )
-        msg.body = "Testing email system"
-        mail.send(msg)
-        return "EMAIL SENT"
-    except Exception as e:
-        return str(e)
-
 def send_verification_email(email, code):
-    try:
-        msg = Message(
-            subject="Email Verification Code",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
-        )
-
-        msg.body = f"Your verification code is: {code}"
-
-        mail.send(msg)
-
-        print("EMAIL SENT SUCCESSFULLY")
-
-    except Exception as e:
-        print("EMAIL ERROR (REAL):", e)
+    msg = Message(
+        subject="Email Verification Code",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+    msg.body = f"Your verification code is: {code}"
+    mail.send(msg)
 
 
 def send_return_email(email, fullname, equipment_name, due_date):
