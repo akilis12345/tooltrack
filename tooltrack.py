@@ -259,6 +259,9 @@ def verify_code():
 
 @app.route("/resend-code", methods=["POST"])
 def resend_code():
+    print("SESSION:", dict(session))  # safe way to print session
+    print("EMAIL:", session.get("pending_email"))
+
     email = session.get("pending_email")
 
     if not email:
@@ -278,13 +281,7 @@ def resend_code():
         mysql.connection.commit()
         cur.close()
 
-        # 🔥 protect mail sending
-        try:
-            send_verification_email(email, code)
-        except Exception as mail_error:
-            print("MAIL FAILED:", mail_error)
-            flash("Code updated but email failed to send.")
-            return redirect(url_for("verify_page"))
+        send_verification_email(email, code)
 
         flash("Verification code resent.")
 
