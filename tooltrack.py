@@ -223,17 +223,21 @@ def verify_page():
 
 @app.route("/verify_code", methods=["POST"])
 def verify_code():
-    email = request.form.get("email")
-    code = request.form.get("code")
+    email = request.form.get("email").strip().lower()
+    code = request.form.get("code").strip()
 
     cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
     cur.execute("""
         SELECT * FROM users
-        WHERE email=%s AND verification_code=%s
+        WHERE LOWER(email)=%s AND verification_code=%s
     """, (email, code))
 
     user = cur.fetchone()
+
+    print("DEBUG EMAIL:", email)
+    print("DEBUG CODE:", code)
+    print("DB RESULT:", user)
 
     if not user:
         flash("Invalid verification code")
