@@ -54,16 +54,15 @@
             {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" action="{{ url_for('verify_code') }}">
+
+    <form method="POST" action="{{ url_for('verify_code') }}">
     <div class="mb-3">
         <input type="text" name="code" class="form-control" placeholder="Enter your verification code" required>
-        <input type="hidden" name="email" value="{{ email }}">
     </div>
     <button type="submit" class="btn btn-primary">Verify Now</button>
 </form>
 
 <form method="POST" action="{{ url_for('resend_code') }}" class="mt-2">
-    <input type="hidden" name="email" value="{{ email }}">
     <button type="submit" class="btn btn-link p-0">Didn't receive the email? Resend</button>
 </form>
 
