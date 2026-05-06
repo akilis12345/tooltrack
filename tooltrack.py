@@ -216,47 +216,39 @@ def verify_page():
     email = session.get("pending_email")
 
     if not email:
-        flash("Session expired. Please sign up again.")
+        flash("Session expired or invalid. Please log in again.")
         return redirect(url_for("home"))
+        
+    return render_template("verify.html", email=email or "")
 
     return render_template("verify.html", email=email)
 
 @app.route("/resend-code", methods=["POST"])
 def resend_code():
+    email = session.get("pending_email")
+    if not email:
+        flash("Session expired. Please log in or sign up again.")
+        return redirect(url_for("home"))
+
     try:
-        email = session.get("pending_email")
-
-        if not email:
-            flash("Session expired. Please sign up again.")
-            return redirect(url_for("home"))
-
         code = str(random.randint(100000, 999999))
 
         cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
         cur.execute("""
             UPDATE users
             SET verification_code = %s
             WHERE email = %s AND is_verified = 0
         """, (code, email))
-
         mysql.connection.commit()
         cur.close()
 
         send_verification_email(email, code)
-
-        flash("Code resent.")
-        return redirect(url_for("verify_page"))
-
+        flash("Verification code resent.")
     except Exception as e:
-        print("🔥 RESEND ERROR:", str(e))
-        flash("Server error during resend.")
-        return redirect(url_for("verify_page"))
+        print("🔥 RESEND ERROR:", repr(e))
+        flash("Server error. Check logs.")
 
-    except Exception as e:
-        print("🔥 RESEND ERROR:", str(e))
-        flash("Server error during resend. Check logs.")
-        return redirect(url_for("verify_page"))
+    return redirect(url_for("verify_page"))
 
 
 def send_verification_email(email, code):
