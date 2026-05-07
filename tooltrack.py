@@ -306,22 +306,31 @@ def resend_code():
 def send_verification_email(email, code):
     try:
         message = Mail(
-            from_email='tooltrack2026@gmail.com',  # must be verified in SendGrid
+            from_email='tooltrack2026@gmail.com',
             to_emails=email,
-            subject='Email Verification Code',
-            plain_text_content=f'Your verification code is: {code}'
+            subject='ToolTrack Verification Code',
+            plain_text_content=f"""
+Hello,
+
+Your verification code is: {code}
+
+Please use this code to verify your account.
+
+If you did not request this, you can ignore this email.
+
+ToolTrack System
+"""
         )
 
         sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
-
         response = sg.send(message)
 
-        print("EMAIL SENT:", response.status_code)
+        print(f"EMAIL SENT to {email} | Status: {response.status_code}")
 
         return True
 
     except Exception as e:
-        print("EMAIL ERROR:", str(e))
+        print(f"EMAIL ERROR for {email}: {str(e)}")
         return False
 
 
