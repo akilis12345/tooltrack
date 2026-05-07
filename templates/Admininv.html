@@ -4,14 +4,11 @@
 <meta charset="UTF-8">
 <title>Inventory</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -20,13 +17,10 @@ body {
     background-attachment: fixed;
 }
 
-/* =========================
-   FIX: PUSH CONTENT AWAY FROM SIDEBAR
-========================= */
+/* CONTAINER (soft upgrade only) */
 .container {
     max-width: 1000px;
     margin: 30px auto;
-    margin-left: 180px; /* ✅ IMPORTANT FIX */
     padding: 20px;
     border-radius: 12px;
 
@@ -34,15 +28,21 @@ body {
     backdrop-filter: blur(6px);
 
     box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+
+    animation: fadeInUp 0.6s ease;
 }
 
 /* TABLE WRAPPER */
 .table-container {
     max-height: 350px;
-    overflow-x: auto;
+    overflow-y: auto;
+
     border-radius: 10px;
     border: 1px solid rgba(0,0,0,0.1);
+
     background: rgba(255,255,255,0.75);
+
+    animation: fadeIn 0.8s ease;
 }
 
 /* TABLE */
@@ -60,6 +60,8 @@ th {
     padding: 12px;
     text-transform: uppercase;
     font-size: 13px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* CELLS */
@@ -67,11 +69,43 @@ td {
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid rgba(0,0,0,0.08);
+    transition: 0.25s;
 }
 
-/* HOVER */
+/* ROW ANIMATION */
+tbody tr {
+    animation: rowFade 0.4s ease both;
+}
+
+/* stagger effect */
+tbody tr:nth-child(odd) { animation-delay: 0.05s; }
+tbody tr:nth-child(even) { animation-delay: 0.1s; }
+
+/* ROW HOVER */
 tbody tr:hover {
     background: rgba(44,62,80,0.08);
+    transform: scale(1.01);
+}
+
+/* STATUS COLORS */
+.available { color: #2ecc71; font-weight: bold; }
+.low { color: #f39c12; font-weight: bold; }
+.out { color: #e74c3c; font-weight: bold; }
+
+/* BUTTON */
+button {
+    background: #2c3e50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+button:hover {
+    background: #1f2a36;
+    transform: scale(1.05);
 }
 
 /* SEARCH */
@@ -85,46 +119,40 @@ form input {
     width: 60%;
     border-radius: 6px;
     border: 1px solid #ccc;
+    outline: none;
+    transition: 0.3s;
 }
 
-form button {
-    padding: 9px 14px;
-    background: #2c3e50;
+form input:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 8px rgba(44,62,80,0.3);
+}
+
+/* NOTIF */
+.notif {
+    background: red;
     color: white;
-    border: none;
-    border-radius: 6px;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 50%;
+    margin-left: 8px;
 }
 
-/* STATUS */
-.available { color: green; font-weight: bold; }
-.low { color: orange; font-weight: bold; }
-.out { color: red; font-weight: bold; }
-
-/* =========================
-   MOBILE FIX
-========================= */
-@media (max-width: 768px) {
-
-    .container {
-        margin-left: 0; /* ✅ remove sidebar space */
-        margin: 10px;
-        padding: 10px;
-    }
-
-    form input {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-
-    form button {
-        width: 100%;
-    }
-
-    table {
-        min-width: 700px; /* allows horizontal scroll */
-    }
+/* ANIMATIONS */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rowFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 
@@ -141,21 +169,44 @@ form button {
 
     <h3 class="menu-title">Menu</h3>
 
-    <a href="/inventoryA"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
-    <a href="/manage"><i class="fa-solid fa-gear"></i> Manage</a>
-    <a href="/users"><i class="fa-solid fa-users"></i> Users</a>
+    <a href="/inventoryA" class="nav-item">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        Inventory
+    </a>
 
-    <a href="/Request">
-        <i class="fa-solid fa-inbox"></i> Requests
+    <a href="/manage" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        Manage
+    </a>
+
+    <a href="/users" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        Users
+    </a>
+
+    <a href="/Request" class="nav-item notif-wrapper">
+        <i class="fa-solid fa-inbox"></i>
+        Requests
+
         {% if borrow_request_count > 0 %}
-            <span class="notif">{{ borrow_request_count }}</span>
+            <span class="notif-badge">{{ borrow_request_count }}</span>
         {% endif %}
     </a>
 
-    <a href="/History"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
-    <a href="/Logout" style="color:red;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    <a href="/History" class="nav-item">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Borrow/reservation History
+    </a>
+
+    <div class="spacer"></div>
+
+    <a href="/Logout" class="nav-item logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </a>
 
 </div>
+
 
 <div class="container">
 
@@ -167,7 +218,7 @@ form button {
     <input type="text" class="lettersonly" name="search"
            placeholder="Search equipment..."
            value="{{ request.args.get('search', '') }}">
-    <button type="submit">Search</button>
+    <button type="submit">🔍 Search</button>
 </form>
 
 <table>
@@ -199,7 +250,12 @@ form button {
             </td>
 
             <td>{{ item.quantity }}</td>
-            <td>{{ item.available }}</td>
+
+            <td class="stock"
+                data-available="{{ item.available }}"
+                data-total="{{ item.quantity }}">
+                {{ item.available }}
+            </td>
 
             <td>
                 {% if item.status == 0 %}
@@ -225,6 +281,21 @@ document.querySelectorAll('.lettersonly').forEach(input => {
     input.addEventListener('input', function () {
         this.value = this.value.replace(/[^A-Za-z\s]/g, '');
     });
+});
+
+document.querySelectorAll(".stock").forEach(cell => {
+    let available = parseInt(cell.dataset.available);
+    let total = parseInt(cell.dataset.total);
+
+    let percent = total > 0 ? (available / total) * 100 : 0;
+
+    if (percent <= 0) {
+        cell.style.color = "red";
+    } else if (percent <= 25) {
+        cell.style.color = "orange";
+    } else {
+        cell.style.color = "green";
+    }
 });
 </script>
 
