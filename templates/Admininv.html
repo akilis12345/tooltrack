@@ -12,6 +12,10 @@
 
 <style>
 
+/* =========================
+   BASE
+========================= */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -21,12 +25,39 @@ body {
 }
 
 /* =========================
-   LAYOUT
+   SIDEBAR (DESKTOP DEFAULT)
+========================= */
+
+.sidebar {
+    width: 220px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #1e2a38;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    padding: 12px 18px;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* =========================
+   CONTENT (DESKTOP OFFSET)
 ========================= */
 
 .container {
     max-width: 1000px;
     margin: 30px auto;
+    margin-left: 250px; /* IMPORTANT FOR DESKTOP */
     padding: 20px;
     border-radius: 12px;
     background: rgba(255,255,255,0.55);
@@ -35,7 +66,7 @@ body {
 }
 
 /* =========================
-   TABLE RESPONSIVE FIX
+   TABLE
 ========================= */
 
 .table-container {
@@ -47,8 +78,8 @@ body {
 
 table {
     width: 100%;
-    min-width: 700px; /* important for mobile scroll */
     border-collapse: collapse;
+    min-width: 700px;
 }
 
 th, td {
@@ -90,30 +121,12 @@ form button {
 }
 
 /* =========================
-   SIDEBAR (DESKTOP)
-========================= */
-
-.sidebar {
-    width: 220px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: #1e2a38;
-    padding-top: 20px;
-}
-
-/* push content right on desktop */
-.container {
-    margin-left: 240px;
-}
-
-/* =========================
-   MOBILE FIX
+   MOBILE ONLY FIX
 ========================= */
 
 @media (max-width: 768px) {
 
+    /* sidebar becomes top */
     .sidebar {
         position: relative;
         width: 100%;
@@ -125,27 +138,24 @@ form button {
     }
 
     .sidebar a {
-        font-size: 12px;
         padding: 8px;
+        font-size: 12px;
     }
 
+    /* remove desktop offset */
     .container {
         margin-left: 0;
         margin-top: 10px;
-        padding: 10px;
+        padding: 12px;
     }
 
     form input {
         width: 100%;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     form button {
         width: 100%;
-    }
-
-    table {
-        min-width: 600px;
     }
 }
 
