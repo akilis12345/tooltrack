@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_mysqldb import MySQL 
 from datetime import date, datetime, timedelta
-from flask_mail import Mail, Message
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from apscheduler.schedulers.background import BackgroundScheduler
 import MySQLdb.cursors 
 import random
@@ -32,21 +33,11 @@ if not all([
 # =========================
 # MAIL CONFIG (FIXED)
 # =========================
-app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'apikey'  # literally the word 'apikey'
-app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
-app.config['MAIL_DEFAULT_SENDER'] = ('ToolTrack System', 'tooltrack2026@gmail.com')
 
-app.config['MAIL_DEBUG'] = True
-app.config['MAIL_TIMEOUT'] = 10
 
 # INIT EXTENSIONS (ORDER MATTERS)
 scheduler = BackgroundScheduler()
-mysql = MySQL(app)
-mail = Mail(app)    
+mysql = MySQL(app)  
 
 
 def is_available(mysql, equipment_name, required_qty, total_qty, start_date, end_date):
@@ -314,28 +305,33 @@ def resend_code():
 
 def send_verification_email(email, code):
     try:
-        msg = Message(
-            subject="Email Verification Code",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
+        message = Mail(
+            from_email='tooltrack2026@gmail.com',  # must be verified in SendGrid
+            to_emails=email,
+            subject='Email Verification Code',
+            plain_text_content=f'Your verification code is: {code}'
         )
-        msg.body = f"Your verification code is: {code}"
-        mail.send(msg)
+
+        sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+
+        response = sg.send(message)
+
+        print("EMAIL SENT:", response.status_code)
+
         return True
+
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print("EMAIL ERROR:", str(e))
         return False
 
 
 def send_return_email(email, fullname, equipment_name, due_date):
     try:
-        msg = Message(
-            "Equipment Return Reminder",
-            sender=app.config['MAIL_USERNAME'],
-            recipients=[email]
-        )
-
-        msg.body = f"""
+        message = Mail(
+            from_email='tooltrack2026@gmail.com',  # must be verified in SendGrid
+            to_emails=email,
+            subject='Equipment Return Reminder',
+            plain_text_content=f'''
 Hello {fullname},
 
 Reminder: your borrowed equipment is due today.
@@ -346,12 +342,17 @@ Due Date: {due_date}
 Please return it on time.
 
 Thank you.
-"""
+'''
+        )
 
-        mail.send(msg)
+        sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+
+        response = sg.send(message)
+
+        print("RETURN EMAIL SENT:", response.status_code)
 
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print("EMAIL ERROR:", str(e))
 
 @app.route("/Logout")
 def Login():
