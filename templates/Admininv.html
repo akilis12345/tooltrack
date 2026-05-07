@@ -2,11 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
-<!-- IMPORTANT FOR MOBILE -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Inventory</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
@@ -22,108 +20,104 @@ body {
     background-attachment: fixed;
 }
 
-/* CONTAINER */
+/* =========================
+   LAYOUT
+========================= */
+
 .container {
-    width: 95%;
     max-width: 1000px;
     margin: 30px auto;
     padding: 20px;
     border-radius: 12px;
-
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(255,255,255,0.55);
     backdrop-filter: blur(6px);
-
     box-shadow: 0 8px 25px rgba(0,0,0,0.18);
 }
 
-/* TABLE WRAPPER */
+/* =========================
+   TABLE RESPONSIVE FIX
+========================= */
+
 .table-container {
-    max-height: 350px;
-    overflow-y: auto;
-    overflow-x: auto; /* IMPORTANT FOR MOBILE */
-
+    width: 100%;
+    overflow-x: auto;
     border-radius: 10px;
-    border: 1px solid rgba(0,0,0,0.1);
-
     background: rgba(255,255,255,0.75);
 }
 
-/* TABLE */
 table {
     width: 100%;
+    min-width: 700px; /* important for mobile scroll */
     border-collapse: collapse;
-    min-width: 700px; /* prevents squishing */
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
 th {
-    position: sticky;
-    top: 0;
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 12px;
-    font-size: 13px;
-}
-
-td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    word-wrap: break-word;
-}
-
-/* ROW HOVER */
-tbody tr:hover {
-    background: rgba(44,62,80,0.08);
-}
-
-/* BUTTON */
-button {
     background: #2c3e50;
     color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
+    position: sticky;
+    top: 0;
 }
 
-/* SEARCH */
+/* =========================
+   SEARCH
+========================= */
+
 form {
-    margin: 15px 0;
+    margin: 10px 0;
     text-align: center;
 }
 
 form input {
-    padding: 9px;
+    padding: 10px;
     width: 60%;
-    max-width: 500px;
     border-radius: 6px;
     border: 1px solid #ccc;
 }
 
-/* STATUS COLORS */
-.available { color: #2ecc71; font-weight: bold; }
-.low { color: #f39c12; font-weight: bold; }
-.out { color: #e74c3c; font-weight: bold; }
-
-/* NOTIF */
-.notif {
-    background: red;
+form button {
+    padding: 10px 14px;
+    border: none;
+    background: #2c3e50;
     color: white;
-    font-size: 12px;
-    padding: 3px 7px;
-    border-radius: 50%;
-    margin-left: 8px;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 /* =========================
-   RESPONSIVE DESIGN
+   SIDEBAR (DESKTOP)
+========================= */
+
+.sidebar {
+    width: 220px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #1e2a38;
+    padding-top: 20px;
+}
+
+/* push content right on desktop */
+.container {
+    margin-left: 240px;
+}
+
+/* =========================
+   MOBILE FIX
 ========================= */
 
 @media (max-width: 768px) {
 
-    /* Sidebar becomes horizontal */
     .sidebar {
         position: relative;
         width: 100%;
+        height: auto;
         display: flex;
         flex-wrap: wrap;
         justify-content: space-around;
@@ -131,42 +125,27 @@ form input {
     }
 
     .sidebar a {
-        font-size: 13px;
+        font-size: 12px;
         padding: 8px;
-    }
-
-    header h1 {
-        font-size: 14px;
-        text-align: center;
     }
 
     .container {
+        margin-left: 0;
+        margin-top: 10px;
         padding: 10px;
-    }
-
-    table {
-        font-size: 12px;
-    }
-
-    th, td {
-        padding: 8px;
     }
 
     form input {
         width: 100%;
-    }
-}
-
-/* VERY SMALL SCREENS */
-@media (max-width: 480px) {
-
-    header h1 {
-        font-size: 12px;
+        margin-bottom: 10px;
     }
 
-    button {
-        padding: 6px 10px;
-        font-size: 12px;
+    form button {
+        width: 100%;
+    }
+
+    table {
+        min-width: 600px;
     }
 }
 
@@ -182,39 +161,28 @@ form input {
     </div>
 </header>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
-
-    <h3 class="menu-title">Menu</h3>
-
     <a href="/inventoryA"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
     <a href="/manage"><i class="fa-solid fa-gear"></i> Manage</a>
     <a href="/users"><i class="fa-solid fa-users"></i> Users</a>
-
-    <a href="/Request">
-        <i class="fa-solid fa-inbox"></i> Requests
-        {% if borrow_request_count > 0 %}
-            <span class="notif">{{ borrow_request_count }}</span>
-        {% endif %}
-    </a>
-
-    <a href="/History"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
-
-    <a href="/Logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-
+    <a href="/Request">Requests</a>
+    <a href="/History">History</a>
+    <a href="/Logout" style="color:red;">Logout</a>
 </div>
 
+<!-- MAIN CONTENT -->
 <div class="container">
 
 <h2>Equipment Inventory</h2>
 
-<form method="GET" action="/inventoryA">
-    <input type="text" class="lettersonly" name="search"
-           placeholder="Search equipment..."
-           value="{{ request.args.get('search', '') }}">
-    <button type="submit">🔍 Search</button>
-</form>
-
 <div class="table-container">
+
+<form method="GET" action="/inventoryA">
+    <input type="text" name="search" placeholder="Search equipment..."
+           value="{{ request.args.get('search', '') }}">
+    <button type="submit">Search</button>
+</form>
 
 <table>
     <thead>
@@ -223,7 +191,7 @@ form input {
             <th>Equipment Name</th>
             <th>Description</th>
             <th>Type</th>
-            <th>Total Quantity</th>
+            <th>Total</th>
             <th>Available</th>
             <th>Status</th>
         </tr>
@@ -237,26 +205,17 @@ form input {
             <td>{{ item.description }}</td>
 
             <td>
-                {% if item.type == 1 %}
-                    Paid
-                {% else %}
-                    Free
-                {% endif %}
+                {% if item.type == 1 %} Paid {% else %} Free {% endif %}
             </td>
 
             <td>{{ item.quantity }}</td>
-
             <td>{{ item.available }}</td>
 
             <td>
-                {% if item.status == 0 %}
-                    Available
-                {% elif item.status == 1 %}
-                    Broken
-                {% elif item.status == 2 %}
-                    Decommissioned
-                {% else %}
-                    Unknown
+                {% if item.status == 0 %} Available
+                {% elif item.status == 1 %} Broken
+                {% elif item.status == 2 %} Decommissioned
+                {% else %} Unknown
                 {% endif %}
             </td>
         </tr>
@@ -266,14 +225,6 @@ form input {
 
 </div>
 </div>
-
-<script>
-document.querySelectorAll('.lettersonly').forEach(input => {
-    input.addEventListener('input', function () {
-        this.value = this.value.replace(/[^A-Za-z\s]/g, '');
-    });
-});
-</script>
 
 </body>
 </html>
