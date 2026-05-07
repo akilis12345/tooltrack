@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -19,49 +18,10 @@ body {
     background-attachment: fixed;
 }
 
-/* =========================
-   HEADER
-========================= */
-
-header {
-    position: relative;
-    z-index: 2;
-}
-
-/* =========================
-   SIDEBAR (DESKTOP)
-========================= */
-
-.sidebar {
-    width: 220px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: #1e2a38;
-    overflow-y: auto;
-    z-index: 1;
-}
-
-.sidebar a {
-    display: block;
-    color: white;
-    padding: 12px;
-    text-decoration: none;
-}
-
-.sidebar a:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-/* =========================
-   CONTAINER
-========================= */
-
+/* CONTAINER */
 .container {
     max-width: 1000px;
     margin: 30px auto;
-    margin-left: 250px;
     padding: 20px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.55);
@@ -69,42 +29,46 @@ header {
     box-shadow: 0 8px 25px rgba(0,0,0,0.18);
 }
 
-/* =========================
-   TABLE
-========================= */
-
+/* TABLE WRAPPER */
 .table-container {
     max-height: 350px;
     overflow-x: auto;
     border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
     background: rgba(255,255,255,0.75);
 }
 
+/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
     min-width: 700px;
 }
 
+/* HEADER */
 th {
     position: sticky;
     top: 0;
-    background: #2c3e50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 12px;
+    text-transform: uppercase;
     font-size: 13px;
 }
 
+/* CELLS */
 td {
     padding: 12px;
     text-align: center;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-/* =========================
-   SEARCH
-========================= */
+/* HOVER */
+tbody tr:hover {
+    background: rgba(44,62,80,0.08);
+}
 
+/* SEARCH */
 form {
     margin: 15px 0;
     text-align: center;
@@ -126,47 +90,16 @@ form button {
     cursor: pointer;
 }
 
-/* =========================
-   MOBILE FIX (IMPORTANT)
-========================= */
+/* STATUS */
+.available { color: green; font-weight: bold; }
+.low { color: orange; font-weight: bold; }
+.out { color: red; font-weight: bold; }
 
+/* MOBILE */
 @media (max-width: 768px) {
-
-    /* sidebar becomes top bar */
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        z-index: 1;
-    }
-
-    .sidebar a {
-        font-size: 12px;
-        padding: 8px;
-        flex: 1 1 40%;
-        text-align: center;
-    }
-
-    /* remove desktop offset */
     .container {
-        margin-left: 0;
-        margin-top: 10px;
+        margin: 10px;
         padding: 10px;
-    }
-
-    /* fix table blocking issue */
-    .table-container {
-        margin-top: 10px;
-        position: relative;
-        z-index: 0;
-        overflow-x: auto;
-    }
-
-    table {
-        min-width: 650px;
     }
 
     form input {
@@ -200,9 +133,7 @@ form button {
     <a href="/Request">
         <i class="fa-solid fa-inbox"></i> Requests
         {% if borrow_request_count > 0 %}
-            <span style="background:red;color:white;padding:2px 6px;border-radius:50%;">
-                {{ borrow_request_count }}
-            </span>
+            <span class="notif">{{ borrow_request_count }}</span>
         {% endif %}
     </a>
 
@@ -218,7 +149,7 @@ form button {
 <div class="table-container">
 
 <form method="GET" action="/inventoryA">
-    <input type="text" name="search"
+    <input type="text" class="lettersonly" name="search"
            placeholder="Search equipment..."
            value="{{ request.args.get('search', '') }}">
     <button type="submit">Search</button>
@@ -273,6 +204,14 @@ form button {
 
 </div>
 </div>
+
+<script>
+document.querySelectorAll('.lettersonly').forEach(input => {
+    input.addEventListener('input', function () {
+        this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+    });
+});
+</script>
 
 </body>
 </html>
