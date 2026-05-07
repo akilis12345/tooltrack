@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inventory</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -18,14 +20,19 @@ body {
     background-attachment: fixed;
 }
 
-/* CONTAINER */
+/* =========================
+   FIX: PUSH CONTENT AWAY FROM SIDEBAR
+========================= */
 .container {
     max-width: 1000px;
     margin: 30px auto;
+    margin-left: 180px; /* ✅ IMPORTANT FIX */
     padding: 20px;
     border-radius: 12px;
+
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(6px);
+
     box-shadow: 0 8px 25px rgba(0,0,0,0.18);
 }
 
@@ -42,7 +49,6 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 700px;
 }
 
 /* HEADER */
@@ -87,7 +93,6 @@ form button {
     color: white;
     border: none;
     border-radius: 6px;
-    cursor: pointer;
 }
 
 /* STATUS */
@@ -95,9 +100,13 @@ form button {
 .low { color: orange; font-weight: bold; }
 .out { color: red; font-weight: bold; }
 
-/* MOBILE */
+/* =========================
+   MOBILE FIX
+========================= */
 @media (max-width: 768px) {
+
     .container {
+        margin-left: 0; /* ✅ remove sidebar space */
         margin: 10px;
         padding: 10px;
     }
@@ -109,6 +118,10 @@ form button {
 
     form button {
         width: 100%;
+    }
+
+    table {
+        min-width: 700px; /* allows horizontal scroll */
     }
 }
 
@@ -125,6 +138,8 @@ form button {
 </header>
 
 <div class="sidebar">
+
+    <h3 class="menu-title">Menu</h3>
 
     <a href="/inventoryA"><i class="fa-solid fa-boxes-stacked"></i> Inventory</a>
     <a href="/manage"><i class="fa-solid fa-gear"></i> Manage</a>
@@ -162,7 +177,7 @@ form button {
             <th>Equipment Name</th>
             <th>Description</th>
             <th>Type</th>
-            <th>Total</th>
+            <th>Total Quantity</th>
             <th>Available</th>
             <th>Status</th>
         </tr>
