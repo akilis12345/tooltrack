@@ -4,3 +4,4 @@ gunicorn
 flask-mail
 apscheduler
 mysqlclient
+sendgrid
